@@ -14,7 +14,7 @@ pub fn show(ui:&mut egui::Ui, text:&mut String, source:Option<&SourceFile>, diag
             ui.add(egui::Label::new(egui::RichText::new(gutter).monospace().color(Color32::GRAY)).selectable(false));
             ui.separator();
             let diags=diagnostics.to_vec(); let src_text=source.map(|s|s.text().to_owned()).unwrap_or_else(||text.clone());
-            let mut layouter=move |ui:&egui::Ui, buffer:&dyn egui::TextBuffer, wrap:f32| { let job=highlight(buffer.as_str(),wrap,&src_text,&diags); ui.fonts(|f|f.layout_job(job)) };
+            let mut layouter=move |ui:&egui::Ui, buffer:&str, wrap:f32| { let job=highlight(buffer,wrap,&src_text,&diags); ui.fonts(|f|f.layout_job(job)) };
             let mut edit=egui::TextEdit::multiline(text).id(id).font(egui::TextStyle::Monospace).desired_width(f32::INFINITY).layouter(&mut layouter).lock_focus(true);
             edit=edit.code_editor();
             let mut out=edit.show(ui);
