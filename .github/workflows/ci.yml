@@ -1,0 +1,48 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Install Linux GUI dependencies
+        run: sudo apt-get update && sudo apt-get install --yes libgtk-3-dev libxkbcommon-dev libwayland-dev
+      - run: cargo test --all-targets
+
+  release-build:
+    name: Release ${{ matrix.name }}
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: windows-x86_64
+            runner: windows-latest
+            artifact: cxxpect-editor.exe
+            binary: target/release/cxxpect-editor.exe
+          - name: linux-x86_64
+            runner: ubuntu-latest
+            artifact: cxxpect-editor-linux-x86_64
+            binary: target/release/cxxpect-editor
+          - name: macos-arm64
+            runner: macos-14
+            artifact: cxxpect-editor-macos-arm64
+            binary: target/release/cxxpect-editor
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Install Linux GUI dependencies
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install --yes libgtk-3-dev libxkbcommon-dev libwayland-dev
+      - run: cargo build --release
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact }}
+          path: ${{ matrix.binary }}
+          if-no-files-found: error

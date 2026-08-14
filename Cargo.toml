@@ -1,0 +1,17 @@
+[package]
+name = "cxxpect-editor"
+version = "0.1.0"
+edition = "2021"
+license = "MIT"
+repository = "https://github.com/x-npis/cxxpect-editor"
+
+[dependencies]
+cxxpect = { git = "https://github.com/x-npis/cxxpect.git", tag = "v0.3.0" }
+eframe = { version = "0.31", features = ["persistence"] }
+rfd = "0.15"
+serde = { version = "1", features = ["derive"] }
+
+[profile.release]
+lto = "thin"
+codegen-units = 1
+strip = true
